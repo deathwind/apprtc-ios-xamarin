@@ -17,7 +17,7 @@ RTCPeerConnectionFactory.InitializeSSL();
 ```
 
 3. Add the following to your `WillTerminate(UIApplication application)` method:
-```objective-c
+```csharp
 RTCPeerConnectionFactory.DeinitializeSSL();
 ```
 
@@ -62,13 +62,11 @@ using AppRTC;
   RemoteView.WeakDelegate = this;
   LocalView.WeakDelegate = this;
 ```
-
 5. Connect to a Video Chat Room
 ```csharp
   Client.SetServerHostUrl(ServerHostUrl);
   Client.ConnectToRoomWithId(RoomName);
 ```
-
 6. Handle the delegate methods for `ARDAppClientDelegate`
 ```csharp
 public void DidChangeState(IARDAppClient client, ARDAppClientState state)
