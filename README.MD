@@ -62,12 +62,13 @@ using AppRTC;
   RemoteView.WeakDelegate = this;
   LocalView.WeakDelegate = this;
 ```
-5. Connect to a Video Chat Room
+5. Connect to a Video Chat Room:
 ```csharp
   Client.SetServerHostUrl(ServerHostUrl);
   Client.ConnectToRoomWithId(RoomName);
 ```
-6. Handle the delegate methods for `ARDAppClientDelegate`
+
+6. Handle the delegate methods for `ARDAppClientDelegate`:
 ```csharp
 public void DidChangeState(IARDAppClient client, ARDAppClientState state)
 {
@@ -102,7 +103,7 @@ public void DidError(IARDAppClient client, NSError error)
 }
 ```
 
-7. Handle the delegate callbacks for `RTCEAGLVideoViewDelegate`
+7. Handle the delegate callbacks for `RTCEAGLVideoViewDelegate`:
 ```csharp
 [Export("videoView:didChangeVideoSize:")]
 public void DidChangeVideoSize(RTCEAGLVideoView videoView, CGSize size)
