@@ -107,6 +107,7 @@ namespace AppRTC
         }
 
         private RTCMediaConstraints DefaultAnswerConstraints => DefaultOfferConstraints;
+		_iceServers.Add(DefaultSTUNServer);
 
         private RTCICEServer DefaultSTUNServer =>
                 new RTCICEServer(new NSUrl(Config.DefaultSTUNServerUrl), "", "");
