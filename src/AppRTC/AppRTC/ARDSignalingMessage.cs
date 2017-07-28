@@ -17,15 +17,16 @@ namespace AppRTC
 
     public class ARDSignalingMessage
     {
-		public static ARDSignalingMessage MessageFromJSONString(string json)
-		{
-			var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-			ARDSignalingMessage message = new ARDSignalingMessage();
-			var type = values["type"];
+        public static ARDSignalingMessage MessageFromJSONString(string json)
+        {
+            var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            ARDSignalingMessage message = new ARDSignalingMessage();
+            var type = values["type"];
             switch (type)
             {
                 case "candidate":
-                    RTCICECandidate candidate = new RTCICECandidate(values["id"], nint.Parse(values["label"]), values["candidate"]);
+                    nint.TryParse(values["label"], out nint label);
+                    RTCICECandidate candidate = new RTCICECandidate(values["id"], label, values["candidate"]);
                     message = new ARDICECandidateMessage(candidate);
                     break;
                 case "offer":
@@ -42,7 +43,7 @@ namespace AppRTC
             }
 
             return message;
-		}
+        }
 
         public ARDSignalingMessageType Type
         {

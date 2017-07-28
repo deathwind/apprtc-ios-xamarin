@@ -16,8 +16,8 @@ namespace AppRTC.Extensions
                 new
                 {
                     type = "candidate",
-                    id = (int)rtcICEcandidate.SdpMLineIndex,
-                    label = rtcICEcandidate.SdpMid,
+                    id = rtcICEcandidate.SdpMid,
+                    label = (int)rtcICEcandidate.SdpMLineIndex,
                     candidate = rtcICEcandidate.Sdp
                 });
         }

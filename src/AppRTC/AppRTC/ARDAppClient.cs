@@ -276,7 +276,7 @@ namespace AppRTC
         {
             UpdateLocalStream(localStream =>
             {
-                var localVideoTrack = CreateLocalVideoTrack(AVCaptureDevicePosition.Back);
+                var localVideoTrack = CreateLocalVideoTrack(AVCaptureDevicePosition.Front);
                 if (localVideoTrack != null)
                 {
                     localStream.AddVideoTrack(localVideoTrack);
@@ -380,11 +380,10 @@ namespace AppRTC
                 Debug.WriteLine("Received {0} video tracks and {1} audio tracks",
                                 stream.VideoTracks.Length, stream.AudioTracks.Length);
 
-                if (stream.VideoTracks.Any())
+                    if (stream.VideoTracks.Length > 0)
                 {
                     var videoTrack = stream.VideoTracks[0];
                     Delegate?.DidReceiveRemoteVideoTrack(this, videoTrack);
-
                     if (_isSpeakerEnabled)
                         EnableSpeaker();
                 }
@@ -540,7 +539,7 @@ namespace AppRTC
                 }
             }
 
-            if (!string.IsNullOrEmpty(cameraId))
+            if (string.IsNullOrEmpty(cameraId))
                 cameraId = devices.FirstOrDefault()?.LocalizedName;
 
             var capturer = RTCVideoCapturer.CapturerWithDeviceName(cameraId);
@@ -577,7 +576,7 @@ namespace AppRTC
                     dict == null ?
                     list : RTCICEServerUtils.ServersFromCEODJSONDictionary(dict));
             });
-        }       
+        }
 
         /// <summary>
         /// Updates the local stream.
@@ -720,26 +719,26 @@ namespace AppRTC
                 var json = data.ToNSString();
                 var resp = JsonConvert.DeserializeObject<ARDMessageResponse>(json);
                 var type = resp == null ? ARDMessageResultType.Unknown : resp.Type;
-				var error = default(NSError);
-				switch (type)
-				{
-					case ARDMessageResultType.InvalidClient:
-						error = CreateError((int)ARDAppError.InvalidClient, "Invalid client.");
-						break;
-					case ARDMessageResultType.InvalidRoom:
-						error = CreateError((int)ARDAppError.InvalidRoom, "Invalid room.");
-						break;
-					case ARDMessageResultType.Unknown:
-						error = CreateError((int)ARDAppError.Unknown, "Unknown error.");
-						break;
-					case ARDMessageResultType.Success:
-						break;
-				}
+                var error = default(NSError);
+                switch (type)
+                {
+                    case ARDMessageResultType.InvalidClient:
+                        error = CreateError((int)ARDAppError.InvalidClient, "Invalid client.");
+                        break;
+                    case ARDMessageResultType.InvalidRoom:
+                        error = CreateError((int)ARDAppError.InvalidRoom, "Invalid room.");
+                        break;
+                    case ARDMessageResultType.Unknown:
+                        error = CreateError((int)ARDAppError.Unknown, "Unknown error.");
+                        break;
+                    case ARDMessageResultType.Success:
+                        break;
+                }
 
-				if (error != null)
-					Delegate?.DidError(this, error);
-				completionHandler?.Invoke(type);
-			});
+                if (error != null)
+                    Delegate?.DidError(this, error);
+                completionHandler?.Invoke(type);
+            });
         }
         #endregion
 

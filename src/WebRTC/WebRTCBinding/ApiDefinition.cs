@@ -657,10 +657,11 @@ namespace WebRTCBinding
         // @required -(void)videoView:(RTCEAGLVideoView *)videoView didChangeVideoSize:(CGSize)size;
         //[Abstract]
         [Export("videoView:didChangeVideoSize:")]
+        [EventArgs("DidChangeVideoSize")]
         void DidChangeVideoSize(RTCEAGLVideoView videoView, CGSize size);
     }
 
-	public interface IRTCVideoRenderer { }
+    public interface IRTCVideoRenderer { }
 
     // @protocol RTCVideoRenderer <NSObject>
     [BaseType(typeof(NSObject))]
@@ -677,9 +678,11 @@ namespace WebRTCBinding
         [Export("renderFrame:")]
         void RenderFrame([NullAllowed]RTCI420Frame frame);
     }
-  
-    // @interface RTCEAGLVideoView : UIView <RTCVideoRenderer>
-    [BaseType(typeof(UIView))]
+
+	// @interface RTCEAGLVideoView : UIView <RTCVideoRenderer>
+	[BaseType(typeof(UIView),
+    Delegates = new string[] { "WeakDelegate" },
+	Events = new Type[] { typeof(RTCEAGLVideoViewDelegate) })]
     interface RTCEAGLVideoView : RTCVideoRenderer
     {
         [Export("initWithFrame:")]

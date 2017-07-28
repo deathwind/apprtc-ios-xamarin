@@ -31,7 +31,7 @@ using System;
 
 namespace AppRTC
 {
-    public static class RTCICEServerUtils
+    internal static class RTCICEServerUtils
     {
         private static readonly NSString UsernameKey = new NSString(@"username");
         private static readonly NSString PasswordKey = new NSString(@"password");

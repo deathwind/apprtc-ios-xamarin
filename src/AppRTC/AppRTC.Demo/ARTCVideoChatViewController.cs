@@ -6,9 +6,14 @@ using CoreGraphics;
 using System.Diagnostics.Contracts;
 using System.Diagnostics;
 using AVFoundation;
+using System.Threading;
 
 namespace AppRTC.Demo
 {
+
+
+
+
     public partial class ARTCVideoChatViewController : UIViewController, IARDAppClientDelegate, IRTCEAGLVideoViewDelegate
     {
 
@@ -75,8 +80,9 @@ namespace AppRTC.Demo
             };
             View.AddGestureRecognizer(tapGestureRecognizer);
 
-            RemoteView.WeakDelegate = this;
-            LocalView.WeakDelegate = this;
+            RemoteView.DidChangeVideoSize += ResizeRemoteView;
+            LocalView.DidChangeVideoSize += ResizeLocalView;
+
 
             _orientationChangeHandler = UIDevice.Notifications
                                                 .ObserveOrientationDidChange(OnOrientationChange);
@@ -102,10 +108,7 @@ namespace AppRTC.Demo
         {
             base.ViewWillAppear(animated);
 
-            LocalViewBottomConstraint.Constant = 0f;
-            LocalViewRightConstraint.Constant = 0f;
-            LocalViewWidthConstraint.Constant = View.Frame.Size.Width;
-            LocalViewHeightConstraint.Constant = View.Frame.Size.Height;
+            SetFullScreenLocalView();
         }
 
         public override void ViewWillDisappear(bool animated)
@@ -118,6 +121,7 @@ namespace AppRTC.Demo
 
         private void JoinRoom()
         {
+            RoomTextField.ResignFirstResponder();
             Disconnect();
 
             OverlayView.Alpha = 0f;
@@ -172,7 +176,10 @@ namespace AppRTC.Demo
         public void DidReceiveRemoteVideoTrack(IARDAppClient client, RTCVideoTrack remoteVideoTrack)
         {
             RemoteVideoTrack = remoteVideoTrack;
-            RemoteVideoTrack.AddRenderer(RemoteView);
+
+            remoteVideoTrack.AddRenderer(RemoteView);
+
+
 
             var videoRect = new CGRect(new CGPoint(0, 0), GetSizeWithOrientation(View.Frame.Size));
             var videoFrame = videoRect.WithAspectRatio(LocalView.Frame.Size);
@@ -189,27 +196,15 @@ namespace AppRTC.Demo
         }
         #endregion
 
-        #region RTCEAGLVideoViewDelegate
+        #region RTCEAGLVideoEvents
 
-        [Export("videoView:didChangeVideoSize:")]
-        public void DidChangeVideoSize(RTCEAGLVideoView videoView, CGSize size)
-        {
-            if (videoView == LocalView)
-            {
-                ResizeLocalView(size);
-            }
-            else
-            {
-                ResizeRemoteView(size);
-            }
-        }
 
         /// <summary>
         /// Resize the Local View depending if it is full screen or thumbnail
         /// </summary>
-        /// <param name="size">Size.</param>
-        private void ResizeLocalView(CGSize size)
+        private void ResizeLocalView(object sender, DidChangeVideoSizeEventArgs e)
         {
+            var size = e.Size;
             var containerWidth = View.Frame.Size.Width;
             var containerHeight = View.Frame.Size.Height;
             var defaultAspectRatiuo = new CGSize(4, 3);
@@ -245,8 +240,9 @@ namespace AppRTC.Demo
             UIView.AnimateNotify(0.4f, View.LayoutIfNeeded, null);
         }
 
-        private void ResizeRemoteView(CGSize size)
+        private void ResizeRemoteView(object sender, DidChangeVideoSizeEventArgs e)
         {
+            var size = e.Size;
             var containerWidth = View.Frame.Size.Width;
             var containerHeight = View.Frame.Size.Height;
             var defaultAspectRatiuo = new CGSize(4, 3);
@@ -281,10 +277,18 @@ namespace AppRTC.Demo
             return true;
         }
 
+        private void SetFullScreenLocalView()
+        {
+            LocalViewBottomConstraint.Constant = 0f;
+            LocalViewRightConstraint.Constant = 0f;
+            LocalViewWidthConstraint.Constant = View.Frame.Size.Width;
+            LocalViewHeightConstraint.Constant = View.Frame.Size.Height;
+        }
+
         private void OnOrientationChange(object sender, NSNotificationEventArgs notification)
         {
-            DidChangeVideoSize(LocalView, LocalVideoSize);
-            DidChangeVideoSize(RemoteView, RemoteVideoSize);
+            ResizeLocalView(null, new DidChangeVideoSizeEventArgs(LocalVideoSize));
+            ResizeRemoteView(null, new DidChangeVideoSizeEventArgs(RemoteVideoSize));
         }
 
         private void OnResignActive(object sender, NSNotificationEventArgs notification)
@@ -296,6 +300,8 @@ namespace AppRTC.Demo
         {
             if (Client == null)
                 return;
+            
+            SetFullScreenLocalView();
 
             OverlayView.Alpha = 1f;
 
@@ -317,7 +323,7 @@ namespace AppRTC.Demo
             RemoteVideoTrack = null;
 
             RemoteView.RenderFrame(null);
-            DidChangeVideoSize(LocalView, LocalVideoSize);
+            ResizeLocalView(null, new DidChangeVideoSizeEventArgs(LocalVideoSize));
         }
 
         private void ToggleButtonContainer()
@@ -331,7 +337,7 @@ namespace AppRTC.Demo
         private void ZoomRemote()
         {
             IsZoom = !IsZoom;
-            DidChangeVideoSize(RemoteView, RemoteVideoSize);
+            ResizeRemoteView(null, new DidChangeVideoSizeEventArgs(RemoteVideoSize));
         }
 
         private void AudioButtonPressed(object sender, EventArgs e)
