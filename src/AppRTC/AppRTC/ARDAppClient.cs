@@ -127,6 +127,8 @@ namespace AppRTC
 
             _isSpeakerEnabled = true;
             _orientationChangeHandler = UIDevice.Notifications.ObserveOrientationDidChange(OnOrientationChanged);
+
+            _iceServers.Add(DefaultSTUNServer);
         }
 
         protected override void Dispose(bool disposing)
