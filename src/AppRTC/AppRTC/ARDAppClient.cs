@@ -53,7 +53,7 @@ namespace AppRTC
 
     public class ARDAppClientConfig
     {
-        public string RoomServerHostUrl { get; set; } = "https://apprtc.appspot.com";
+        public string RoomServerHostUrl { get; set; } = "http://91.231.0.173:3020/";
         public string RoomServerByeFormat { get; set; } = "{0}/leave/{1}/{2}";
         public string RoomServerRegisterFormat { get; set; } = "{0}/join/{1}";
         public string RoomServerMessageFormat { get; set; } = "{0}/message/{1}/{2}";
@@ -107,8 +107,7 @@ namespace AppRTC
         }
 
         private RTCMediaConstraints DefaultAnswerConstraints => DefaultOfferConstraints;
-		_iceServers.Add(DefaultSTUNServer);
-
+		
         private RTCICEServer DefaultSTUNServer =>
                 new RTCICEServer(new NSUrl(Config.DefaultSTUNServerUrl), "", "");
 

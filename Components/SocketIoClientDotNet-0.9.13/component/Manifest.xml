@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<component format="1" id="SocketIoClientDotNet" is-shell="true">
+  <name>Socket.IO Client .NET</name>
+  <publisher>Matthias Ludwig</publisher>
+  <publisher-url>https://github.com/Quobject/SocketIoClientDotNet/</publisher-url>
+  <src-url>https://github.com/Quobject/SocketIoClientDotNet</src-url>
+  <version>0.9.13</version>
+  <summary>This is the Socket.IO Client Library for .NET.</summary>
+  <packages>
+    <package id="SocketIoClientDotNet" version="0.9.13" framework="android" />
+  </packages>
+  <samples>
+    <sample id="SocketIoClientDotNet.Sample.Xamarin-Android">
+      <name>Android Sample</name>
+      <summary>Android Sample</summary>
+    </sample>
+    <sample id="SocketIoClientDotNet.Sample.Xamarin-iOS">
+      <name>iOS Sample</name>
+      <summary>iOS Sample</summary>
+    </sample>
+  </samples>
+</component>

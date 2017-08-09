@@ -6,7 +6,6 @@ using CoreGraphics;
 using System.Diagnostics.Contracts;
 using System.Diagnostics;
 using AVFoundation;
-using System.Threading;
 
 namespace AppRTC.Demo
 {
@@ -17,9 +16,10 @@ namespace AppRTC.Demo
     public partial class ARTCVideoChatViewController : UIViewController, IARDAppClientDelegate, IRTCEAGLVideoViewDelegate
     {
 
-        private const string ServerHostUrl = "https://appr.tc";
+        //private const string ServerHostUrl = "https://appr.tc";
+		private const string ServerHostUrl = "https://progetto-casa.bss-one.net:3021";
 
-        private string _roomName;
+		private string _roomName;
         private IDisposable _orientationChangeHandler;
         private IDisposable _willResignHandler;
 
