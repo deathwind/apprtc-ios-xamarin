@@ -345,6 +345,8 @@ namespace AppRTC
             Debug.WriteLine("audio muted");
             UpdateLocalStream(localStream =>
             {
+                if (localStream == null || localStream.AudioTracks.Length == 0)
+                    return false;
                 _defaultAudioTrack = localStream.AudioTracks[0];
                 localStream.RemoveAudioTrack(_defaultAudioTrack);
                 return true;
@@ -356,6 +358,8 @@ namespace AppRTC
             Debug.WriteLine("audio unmuted");
             UpdateLocalStream(localStream =>
             {
+				if (localStream == null || localStream.AudioTracks.Length == 0)
+					return false;
                 localStream.AddAudioTrack(_defaultAudioTrack);
                 if (_isSpeakerEnabled)
                     EnableSpeaker();
@@ -368,6 +372,8 @@ namespace AppRTC
             Debug.WriteLine("video muted");
             UpdateLocalStream(localStream =>
             {
+                if (localStream == null || localStream.VideoTracks.Length == 0)
+					return false;
                 _defaultVideoTrack = localStream.VideoTracks[0];
                 localStream.RemoveVideoTrack(_defaultVideoTrack);
                 return true;
@@ -380,6 +386,8 @@ namespace AppRTC
 
             UpdateLocalStream(localStream =>
             {
+                if (localStream == null)
+					return false;
                 localStream.AddVideoTrack(_defaultVideoTrack);
                 return true;
             });
