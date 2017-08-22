@@ -83,6 +83,9 @@ namespace AppRTC
         private RTCAudioTrack _defaultAudioTrack;
         private RTCVideoTrack _defaultVideoTrack;
 
+        private bool _isAudioEnable = true;
+        private bool _isVideoEnable = true;
+
         private ARDAppClientState _state;
 
         private readonly NSObject _orientationChangeHandler;
@@ -151,6 +154,54 @@ namespace AppRTC
                 _state = value;
                 Delegate?.DidChangeState(this, value);
             }
+        }
+
+        public bool IsAudioEnable
+        {
+            get => _isAudioEnable;
+            set
+            {
+                if (_isAudioEnable == value)
+                    return;
+                _isAudioEnable = true;
+                if (value)
+                {
+                    UnmuteAudioIn();
+                }
+                else
+                {
+                    MuteAudioIn();
+                }
+
+            }
+        }
+
+        public bool IsVideoEnable
+        {
+            get => _isVideoEnable;
+            set
+            {
+                if (_isVideoEnable == value)
+                    return;
+                if (value)
+                    UnmuteVideoIn();
+                else
+                    MuteVideoIn();
+            }
+        }
+
+        public bool IsBackCamera
+        {
+            get; private set;
+        }
+
+
+        public void SwitchCamera()
+        {
+            if (IsBackCamera)
+                SwapCameraToFront();
+            else
+                SwapCameraToBack();
         }
 
         public ARDAppClientConfig Config { get; private set; }
@@ -540,6 +591,8 @@ namespace AppRTC
                     break;
                 }
             }
+
+            IsBackCamera = devices != null && position == AVCaptureDevicePosition.Back;
 
             if (string.IsNullOrEmpty(cameraId))
                 cameraId = devices.FirstOrDefault()?.LocalizedName;
