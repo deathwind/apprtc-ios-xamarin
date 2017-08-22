@@ -65,7 +65,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Distribution: BIESSE SOLUTION SRL (VG34VQP9G2)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
@@ -76,6 +76,7 @@
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
+    <CodesignProvision>bss_test_profile</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -106,10 +107,6 @@
     <ProjectReference Include="..\AppRTC\AppRTC.csproj">
       <Project>{A8675957-9FC4-4758-8144-27DF00980354}</Project>
       <Name>AppRTC</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\SocketRocket\SocketRocketBinding\SocketRocketBinding.csproj">
-      <Project>{8D8A4C45-3380-438F-A5D6-6A519052C2C1}</Project>
-      <Name>SocketRocketBinding</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WebRTC\WebRTCBinding\WebRTCBinding.csproj">
       <Project>{A6E76C98-216E-4B88-92B6-B77D0E77B55E}</Project>

@@ -107,7 +107,7 @@ namespace AppRTC
         }
 
         private RTCMediaConstraints DefaultAnswerConstraints => DefaultOfferConstraints;
-		
+
         private RTCICEServer DefaultSTUNServer =>
                 new RTCICEServer(new NSUrl(Config.DefaultSTUNServerUrl), "", "");
 
@@ -382,7 +382,7 @@ namespace AppRTC
                 Debug.WriteLine("Received {0} video tracks and {1} audio tracks",
                                 stream.VideoTracks.Length, stream.AudioTracks.Length);
 
-                    if (stream.VideoTracks.Length > 0)
+                if (stream.VideoTracks.Length > 0)
                 {
                     var videoTrack = stream.VideoTracks[0];
                     Delegate?.DidReceiveRemoteVideoTrack(this, videoTrack);
@@ -587,7 +587,7 @@ namespace AppRTC
         /// <param name="callback">Callback.</param>
         private void UpdateLocalStream(Func<RTCMediaStream, bool> callback)
         {
-            if (_peerConnection == null)
+            if (_peerConnection == null || _peerConnection.LocalStreams.Length == 0)
                 return;
             var localMedia = _peerConnection.LocalStreams[0];
             var shouldRefresh = callback?.Invoke(localMedia);

@@ -16,8 +16,8 @@ namespace AppRTC.Demo
     public partial class ARTCVideoChatViewController : UIViewController, IARDAppClientDelegate, IRTCEAGLVideoViewDelegate
     {
 
-        //private const string ServerHostUrl = "https://appr.tc";
-		private const string ServerHostUrl = "https://progetto-casa.bss-one.net:3021";
+        private const string ServerHostUrl = "https://appr.tc";
+		//private const string ServerHostUrl = "https://progetto-casa.bss-one.net:3021";
 
 		private string _roomName;
         private IDisposable _orientationChangeHandler;

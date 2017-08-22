@@ -1,10 +1,10 @@
 ﻿using System;
 using Foundation;
 using Newtonsoft.Json;
-using SocketRocketBinding;
 using System.Diagnostics.Contracts;
 using System.Diagnostics;
 using AppRTC.Extensions;
+using Square.SocketRocket;
 
 namespace AppRTC
 {
@@ -19,14 +19,16 @@ namespace AppRTC
         Error
     }
 
-    public class ARDWebSocketChannel : SRWebSocketDelegate 
+    public class ARDWebSocketChannel
     {
+
+
         private IARDWebSocketChannelDelegate _delegate;
         private string _webSocketUrl;
         private string _webSockerRestUrl;
         private string _roomId;
         private string _clientId;
-        private readonly SRWebSocket _socket;
+        private WebSocket _socket;
         private ARDWebSocketChannelState _state;
 
         private string WebRestFormated => $"{_webSockerRestUrl}/{_roomId}/{_clientId}";
@@ -36,22 +38,12 @@ namespace AppRTC
             _webSocketUrl = webSocketUrl;
             _webSockerRestUrl = webSockerRestUrl;
             _delegate = @delegate;
-            _socket = new SRWebSocket(new NSUrl(_webSocketUrl))
-            {
-                Delegate = this
-            };
+            _socket = new WebSocket(new NSUrl(_webSocketUrl));
+
+            Wire(_socket);
+
             Debug.WriteLine("Opening WebSocket.");
             _socket.Open();
-        }
-
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Disconnect();
-            }
-            base.Dispose(disposing);
         }
 
 
@@ -114,6 +106,7 @@ namespace AppRTC
             if (State == ARDWebSocketChannelState.Closed ||
                State == ARDWebSocketChannelState.Error)
                 return;
+            UnWire(_socket);
             _socket.Close();
             Debug.WriteLine($"C->WSS DELETE rid:{_roomId} cid:{_clientId}");
             var url = new NSUrl(WebRestFormated);
@@ -125,30 +118,47 @@ namespace AppRTC
             request.SendAsyncRequest(null);
         }
 
-        #region SRWebSocketDelegate
+        #region Events
 
-        public override void WebSocketDidOpen(SRWebSocket webSocket)
+        private void Wire(WebSocket socket)
+        {
+			socket.WebSocketOpened += WebSocketDidOpen;
+			socket.WebSocketFailed += WebSocketDidFailWithError;
+			socket.WebSocketClosed += WebSocketDidClose;
+			socket.ReceivedMessage += WebSocketDidReceiveMessage;
+        }
+
+        private void UnWire(WebSocket socket)
+        {
+			socket.WebSocketOpened -= WebSocketDidOpen;
+			socket.WebSocketFailed -= WebSocketDidFailWithError;
+			socket.WebSocketClosed -= WebSocketDidClose;
+			socket.ReceivedMessage -= WebSocketDidReceiveMessage;
+        }
+
+        private void WebSocketDidOpen(object sender, EventArgs e)
         {
             Debug.WriteLine("WebSocket connection opened.");
             State = ARDWebSocketChannelState.Open;
             RegisterWithCollider();
         }
 
-        public override void WebSocketDidReceiveMessage(SRWebSocket webSocket, NSObject message)
+        private void WebSocketDidReceiveMessage(object sender, WebSocketReceivedMessageEventArgs e)
         {
+            var message = e.Message;
             var socketResponse = default(SocketResponse);
 
             try
             {
                 socketResponse = JsonConvert.DeserializeObject<SocketResponse>(message?.ToString());
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.WriteLine($"Invalid json error: {ex.Message} message:{message}");
                 return;
             }
 
-            if(!string.IsNullOrEmpty(socketResponse.error))
+            if (!string.IsNullOrEmpty(socketResponse.error))
             {
                 Debug.WriteLine($"WSS error: {socketResponse.error}");
                 return;
@@ -160,15 +170,15 @@ namespace AppRTC
             _delegate?.DidReceiveMessage(payload);
         }
 
-        public override void WebSocketDidFailWithError(SRWebSocket webSocket, NSError error)
+        private void WebSocketDidFailWithError(object sender, WebSocketFailedEventArgs e)
         {
-            Debug.WriteLine($"WebSocket error: {error}");
+            Debug.WriteLine($"WebSocket error: {e.Error}");
             State = ARDWebSocketChannelState.Error;
         }
 
-        public override void WebSocketDidClose(SRWebSocket webSocket, nint code, string reason, bool wasClean)
+        private void WebSocketDidClose(object sender, WebSocketClosedEventArgs e)
         {
-            Debug.WriteLine($"WebSocket closed with code: {code} reason:{reason} wasClean:{wasClean}");
+            Debug.WriteLine($"WebSocket closed with code: {e.Code} reason:{e.Reason} wasClean:{e.WasClean}");
             Contract.Requires(State != ARDWebSocketChannelState.Error);
             State = ARDWebSocketChannelState.Closed;
         }
@@ -195,7 +205,5 @@ namespace AppRTC
             _socket.Send(new NSString(message, NSStringEncoding.UTF8));
             State = ARDWebSocketChannelState.Registered;
         }
-
-
     }
 }
