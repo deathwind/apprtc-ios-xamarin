@@ -134,6 +134,13 @@ namespace AppRTC
             _iceServers.Add(DefaultSTUNServer);
         }
 
+        /// <summary>
+        /// Gets or sets the camera position.
+        /// First camera build
+        /// </summary>
+        /// <value>The camera position.</value>
+        public AVCaptureDevicePosition PreferCameraPosition { get; set; } = AVCaptureDevicePosition.Back;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -315,6 +322,10 @@ namespace AppRTC
         {
             UpdateLocalStream(localStream =>
             {
+                if (localStream == null)
+                    return false;
+                if (localStream.VideoTracks != null && localStream.VideoTracks.Length > 0)
+                    localStream.RemoveVideoTrack(localStream.VideoTracks[0]);
                 var localVideoTrack = CreateLocalVideoTrack(AVCaptureDevicePosition.Back);
                 if (localVideoTrack != null)
                 {
@@ -329,6 +340,10 @@ namespace AppRTC
         {
             UpdateLocalStream(localStream =>
             {
+                if (localStream == null)
+                    return false;
+                if (localStream.VideoTracks != null && localStream.VideoTracks.Length > 0)
+                    localStream.RemoveVideoTrack(localStream.VideoTracks[0]);
                 var localVideoTrack = CreateLocalVideoTrack(AVCaptureDevicePosition.Front);
                 if (localVideoTrack != null)
                 {
@@ -358,8 +373,8 @@ namespace AppRTC
             Debug.WriteLine("audio unmuted");
             UpdateLocalStream(localStream =>
             {
-				if (localStream == null || localStream.AudioTracks.Length == 0)
-					return false;
+                if (localStream == null || localStream.AudioTracks.Length == 0)
+                    return false;
                 localStream.AddAudioTrack(_defaultAudioTrack);
                 if (_isSpeakerEnabled)
                     EnableSpeaker();
@@ -373,7 +388,7 @@ namespace AppRTC
             UpdateLocalStream(localStream =>
             {
                 if (localStream == null || localStream.VideoTracks.Length == 0)
-					return false;
+                    return false;
                 _defaultVideoTrack = localStream.VideoTracks[0];
                 localStream.RemoveVideoTrack(_defaultVideoTrack);
                 return true;
@@ -387,7 +402,7 @@ namespace AppRTC
             UpdateLocalStream(localStream =>
             {
                 if (localStream == null)
-					return false;
+                    return false;
                 localStream.AddVideoTrack(_defaultVideoTrack);
                 return true;
             });
@@ -543,7 +558,7 @@ namespace AppRTC
             {
                 localStream.RemoveVideoTrack(localStream.VideoTracks[0]);
 
-                var localVideoTrack = CreateLocalVideoTrack();
+                var localVideoTrack = CreateLocalVideoTrack(IsBackCamera ? AVCaptureDevicePosition.Back : AVCaptureDevicePosition.Front);
                 if (localVideoTrack != null)
                 {
                     localStream.AddVideoTrack(localVideoTrack);
@@ -556,7 +571,7 @@ namespace AppRTC
         private RTCMediaStream CreateLocalMediaStream()
         {
             var localStream = _factory.MediaStreamWithLabel("ARDAMS");
-            var localVideoTrack = CreateLocalVideoTrack();
+            var localVideoTrack = CreateLocalVideoTrack(PreferCameraPosition);
             if (localVideoTrack != null)
             {
                 localStream.AddVideoTrack(localVideoTrack);
