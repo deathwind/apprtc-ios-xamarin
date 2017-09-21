@@ -312,6 +312,28 @@ namespace AppRTC
                 }
                 _channel = null;
             }
+            try
+            {
+                var localStream = _peerConnection.LocalStreams.FirstOrDefault();
+                if (localStream != null)
+                {
+                    var videoTracks = localStream.VideoTracks.ToArray();
+                    foreach (var videotrack in videoTracks)
+                        localStream.RemoveVideoTrack(videotrack);
+
+                    var audioTracks = localStream.AudioTracks.ToArray();
+
+                    foreach (var audioTrack in audioTracks)
+                        localStream.RemoveAudioTrack(audioTrack);
+                }
+
+                _peerConnection.Close();
+            }
+            catch
+            {
+
+            }
+
             _clientId = null;
             _roomId = null;
             _isInitiator = false;
@@ -845,7 +867,8 @@ namespace AppRTC
         #region Collider methods
         private void SendSignalingMessageToCollider(ARDSignalingMessage message)
         {
-            _channel.SendData(message.JsonData);
+            if (message != null)
+                _channel.SendData(message.JsonData);
         }
 
         private void RegisterWithColliderIfReady()
