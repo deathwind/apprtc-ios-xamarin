@@ -88,6 +88,8 @@ namespace AppRTC
 
         private ARDAppClientState _state;
 
+        private ARDRegisterResponse _registerResponse;
+
         private readonly NSObject _orientationChangeHandler;
 
         #region Defaults
@@ -236,11 +238,12 @@ namespace AppRTC
             // Register with room server.
             RegisterWithRoomServerForRoomId(roomName, response =>
             {
+                _registerResponse = response;
+
                 if (response == null ||
                     response.result == ARDRegisterResultType.FULL ||
                     response.result == ARDRegisterResultType.UNKNOWN)
                 {
-
                     Debug.WriteLine("Failed to register with room server. Result:{0}", response?.result);
                     Disconnect();
 
@@ -455,6 +458,8 @@ namespace AppRTC
             {
                 Debug.WriteLine("Received {0} video tracks and {1} audio tracks",
                                 stream.VideoTracks.Length, stream.AudioTracks.Length);
+                
+                Delegate?.ReceivedMedia(stream.VideoTracks.Any(), stream.AudioTracks.Any());
 
                 if (stream.VideoTracks.Length > 0)
                 {
@@ -479,6 +484,23 @@ namespace AppRTC
         public void PeerConnection(RTCPeerConnection peerConnection, RTCICEConnectionState newState)
         {
             Debug.WriteLine("ICE state changed: {0}", newState);
+
+			DispatchQueue.MainQueue.DispatchAsync(() =>
+			{
+				var message = new ARDICECandidateMessage(candidate);
+				SendSignalingMessage(message);
+			});
+
+			switch (newState)
+			{
+                case RTCICEConnectionState.Failed:
+                    State = ARDAppClientState.ConnectionFailed;
+                    break;
+                case RTCICEConnectionState.Disconnected:
+                case RTCICEConnectionState.Closed:
+                    State = ARDAppClientState.Disconnected;
+                    break;
+			}
         }
 
         public void PeerConnection(RTCPeerConnection peerConnection, RTCICEGatheringState newState)
@@ -848,6 +870,11 @@ namespace AppRTC
         {
             if (!_isTurnComplete || !IsRegisteredWithRoomServer)
                 return;
+            
+            var shouldConnect = Delegate?.ShouldConnect(_registerResponse);
+            if (shouldConnect.HasValue && !shouldConnect.Value)
+                return;
+
             State = ARDAppClientState.Connected;
 
             _peerConnection = _factory.PeerConnectionWithICEServers(

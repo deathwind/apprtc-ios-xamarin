@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AppRTC
 {
-	class ARDRegisterResponse
+	public class ARDRegisterResponse
 	{
 		public Params @params { get; set; }
 		public ARDRegisterResultType result { get; set; }
@@ -54,7 +54,7 @@ namespace AppRTC
 		public DateTime time { get; set; }
 	}
 
-	enum ARDRegisterResultType
+	public enum ARDRegisterResultType
 	{
 		UNKNOWN = 0,
 		SUCCESS = 1,

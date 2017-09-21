@@ -8,7 +8,8 @@ namespace AppRTC
 	{
 		Disconnected,
 		Connecting,
-		Connected
+		Connected,
+        ConnectionFailed
 	}
 
 	public interface IARDAppClient
@@ -22,7 +23,7 @@ namespace AppRTC
 		void SwapCameraToFront();
 
 		void MuteAudioIn();
-		void UnmuteAudioIn();
+		void UnmuteAudioIn();      
 
         void MuteVideoIn();
         void UnmuteVideoIn();
@@ -30,6 +31,8 @@ namespace AppRTC
 
 	public interface IARDAppClientDelegate
 	{
+		void ReceivedMedia(bool haveVideo, bool haveAudio);
+		bool ShouldConnect(ARDRegisterResponse registerResponse);
 		void DidChangeState(IARDAppClient client, ARDAppClientState state);
 		void DidReceiveLocalVideoTrack(IARDAppClient client, RTCVideoTrack localVideoTrack);
 		void DidReceiveRemoteVideoTrack(IARDAppClient client, RTCVideoTrack remoteVideoTrack);
