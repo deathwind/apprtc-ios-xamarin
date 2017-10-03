@@ -504,26 +504,23 @@ namespace AppRTC
         }
 
         public void PeerConnection(RTCPeerConnection peerConnection, RTCICEConnectionState newState)
-        {
-            Debug.WriteLine("ICE state changed: {0}", newState);
+	{
+	    Debug.WriteLine("ICE state changed: {0}", newState);
 
-			DispatchQueue.MainQueue.DispatchAsync(() =>
-			{
-				var message = new ARDICECandidateMessage(candidate);
-				SendSignalingMessage(message);
-			});
-
+		DispatchQueue.MainQueue.DispatchAsync(() =>
+		{
 			switch (newState)
 			{
-                case RTCICEConnectionState.Failed:
-                    State = ARDAppClientState.ConnectionFailed;
-                    break;
-                case RTCICEConnectionState.Disconnected:
-                case RTCICEConnectionState.Closed:
-                    State = ARDAppClientState.Disconnected;
-                    break;
+		    case RTCICEConnectionState.Failed:
+			State = ARDAppClientState.ConnectionFailed;
+			break;
+		    case RTCICEConnectionState.Disconnected:
+		    case RTCICEConnectionState.Closed:
+		     State = ARDAppClientState.Disconnected;
+			    break;
 			}
-        }
+		});			
+	}
 
         public void PeerConnection(RTCPeerConnection peerConnection, RTCICEGatheringState newState)
         {
