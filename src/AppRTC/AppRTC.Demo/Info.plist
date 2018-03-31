@@ -43,6 +43,6 @@
 		<true/>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>bss.com.test</string>
+	<string>com.alexc.webrtc</string>
 </dict>
 </plist>

@@ -17,9 +17,9 @@ namespace AppRTC.Demo
     {
 
         private const string ServerHostUrl = "https://appr.tc";
-		//private const string ServerHostUrl = "https://progetto-casa.bss-one.net:3021";
+        //private const string ServerHostUrl = "https://progetto-casa.bss-one.net:3021";
 
-		private string _roomName;
+        private string _roomName;
         private IDisposable _orientationChangeHandler;
         private IDisposable _willResignHandler;
 
@@ -373,6 +373,16 @@ namespace AppRTC.Demo
             return orientation.IsLandscape() ?
                               new CGSize(size.Height / 4f, size.Width / 4f) :
                               new CGSize(size.Width / 4f, size.Height / 4f);
+        }
+
+        public void ReceivedMedia(bool haveVideo, bool haveAudio)
+        {
+            
+        }
+
+        public bool ShouldConnect(ARDRegisterResponse registerResponse)
+        {
+            return registerResponse.result == ARDRegisterResultType.SUCCESS;
         }
     }
 }
